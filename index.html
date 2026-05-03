@@ -3,170 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NANOGRAM | Ultimate Edition</title>
+    <title>WhatsApp Clone | NanoGram</title>
     
-    <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;800&family=Space+Grotesk:wght@300;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap');
         
-        :root {
-            --p: #7c3aed;
-            --s: #db2777;
-            --bg: #030303;
-            --surface: rgba(255, 255, 255, 0.02);
-            --accent: #10b981;
-        }
-
         body {
-            background-color: var(--bg);
-            background-image: 
-                radial-gradient(at 10% 10%, rgba(124, 58, 237, 0.1) 0px, transparent 40%),
-                radial-gradient(at 90% 90%, rgba(219, 39, 119, 0.1) 0px, transparent 40%);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            color: #fafafa;
+            background-color: #0c1317; /* WhatsApp Dark Background */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             height: 100vh;
-            margin: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            margin: 0;
         }
 
-        .master-container {
-            width: 100%;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(40px);
-            display: flex;
-            position: relative;
-        }
-
-        @media (min-width: 1024px) {
-            .master-container {
-                width: 96%;
-                height: 92vh;
-                border-radius: 40px;
-                border: 1px solid rgba(255, 255, 255, 0.05);
-                box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8);
-                overflow: hidden;
-            }
+        /* WhatsApp Chat Wallpaper Background */
+        #messageCanvas {
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            background-blend-mode: overlay;
+            background-color: #0b141a;
         }
 
         .bubble {
-            max-width: 75%;
-            padding: 1rem 1.25rem;
+            max-width: 65%;
+            padding: 6px 10px 8px 10px;
+            margin-bottom: 4px;
+            font-size: 14.5px;
             position: relative;
-            font-weight: 300;
-            line-height: 1.6;
-            font-size: 0.95rem;
-            margin-bottom: 10px;
-            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
         }
 
+        /* User Message (Right side) */
         .bubble-out {
             align-self: flex-end;
-            background: linear-gradient(135deg, var(--p), var(--s));
-            border-radius: 24px 24px 4px 24px;
+            background-color: #005c4b;
+            color: #e9edef;
+            border-radius: 8px 0 8px 8px;
         }
 
+        /* Others Message (Left side) */
         .bubble-in {
             align-self: flex-start;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px 24px 24px 4px;
+            background-color: #202c33;
+            color: #e9edef;
+            border-radius: 0 8px 8px 8px;
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .time-stamp {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            float: right;
+            margin-top: 4px;
+            margin-left: 8px;
         }
 
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .custom-scroll::-webkit-scrollbar { width: 3px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .sender-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #ffbc38;
+            margin-bottom: 2px;
+        }
     </style>
 </head>
-<body>
+<body class="p-0 sm:p-4">
 
-    <div class="master-container">
-        <!-- Sidebar Navigation -->
-        <nav class="w-20 border-r border-white/5 flex flex-col items-center py-8 justify-between z-50 bg-black/20">
-            <div class="flex flex-col items-center gap-10">
-                <div class="w-12 h-12 bg-gradient-to-tr from-violet-600 to-pink-600 rounded-2xl flex items-center justify-center font-black text-xl italic shadow-lg">N</div>
-                <div class="flex flex-col gap-8">
-                    <button class="text-violet-500"><i data-lucide="message-square"></i></button>
-                    <button class="text-white/40"><i data-lucide="compass"></i></button>
-                    <button class="text-white/40"><i data-lucide="heart"></i></button>
+    <div class="w-full h-full max-w-[1600px] flex overflow-hidden shadow-2xl bg-[#111b21]">
+        <!-- Sidebar (Hidden on small screens) -->
+        <div class="hidden md:flex w-[400px] border-r border-white/10 flex-col">
+            <header class="h-16 bg-[#202c33] flex items-center px-4 justify-between">
+                <div class="w-10 h-10 bg-slate-500 rounded-full"></div>
+                <div class="flex gap-6 text-[#aebac1]">
+                    <i data-lucide="users-2"></i>
+                    <i data-lucide="circle-dashed"></i>
+                    <i data-lucide="message-square-plus"></i>
+                </div>
+            </header>
+            <div class="p-3">
+                <div class="bg-[#202c33] rounded-lg flex items-center px-4 py-2 gap-4">
+                    <i data-lucide="search" class="w-4 h-4 text-[#aebac1]"></i>
+                    <input type="text" placeholder="Search or start new chat" class="bg-transparent text-sm outline-none text-white w-full">
                 </div>
             </div>
-            <button class="text-white/20 hover:text-white"><i data-lucide="settings"></i></button>
-        </nav>
-
-        <!-- Chat List -->
-        <aside class="w-80 border-r border-white/5 hidden sm:flex flex-col bg-black/10">
-            <div class="p-8 pb-4">
-                <h2 class="text-2xl font-black font-['Space_Grotesk']">Messages</h2>
-            </div>
-            <div class="flex-1 overflow-y-auto custom-scroll px-4 space-y-2">
-                <div class="p-4 rounded-[28px] bg-white/5 border border-white/5 flex items-center gap-4 cursor-pointer">
-                    <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center">🌍</div>
-                    <div>
-                        <h4 class="font-bold text-sm text-violet-400">Global Lounge</h4>
-                        <p class="text-xs text-white/40">Live Chat Active</p>
+            <div class="flex-1 overflow-y-auto">
+                <div class="flex items-center p-3 hover:bg-[#2a3942] cursor-pointer border-b border-white/5">
+                    <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center text-xl">🌍</div>
+                    <div class="ml-4 flex-1">
+                        <div class="flex justify-between"><span class="text-white">Global Lounge</span> <span class="text-xs text-gray-400">1:12 AM</span></div>
+                        <p class="text-sm text-gray-400 truncate">Tap to chat with everyone</p>
                     </div>
                 </div>
             </div>
-        </aside>
+        </div>
 
-        <!-- Main Chat -->
-        <main class="flex-1 flex flex-col relative">
-            <header class="h-20 px-8 border-b border-white/5 flex justify-between items-center bg-black/5">
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 text-xl">🌍</div>
+        <!-- Main Chat Area -->
+        <div class="flex-1 flex flex-col">
+            <header class="h-16 bg-[#202c33] flex items-center px-4 justify-between z-10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">🌍</div>
                     <div>
-                        <h3 class="font-bold">Global Lounge</h3>
-                        <p class="text-[9px] text-green-500 uppercase font-black tracking-widest">Online</p>
+                        <h3 class="text-white font-semibold">Global Lounge</h3>
+                        <p class="text-xs text-green-500">online</p>
                     </div>
                 </div>
-                <button id="btnCall" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 hover:bg-green-500/20"><i data-lucide="phone" class="w-4 h-4"></i></button>
+                <div class="flex gap-5 text-[#aebac1]">
+                    <i data-lucide="search" class="w-5 h-5 cursor-pointer"></i>
+                    <i data-lucide="more-vertical" class="w-5 h-5 cursor-pointer"></i>
+                </div>
             </header>
 
-            <!-- Message Canvas -->
-            <div id="messageCanvas" class="flex-1 overflow-y-auto p-8 flex flex-col custom-scroll">
-                <div class="flex justify-center my-4">
-                    <span class="px-4 py-1 rounded-full bg-white/5 text-[9px] text-white/30 uppercase tracking-widest">Encrypted Session</span>
-                </div>
-            </div>
+            <!-- Message Area -->
+            <div id="messageCanvas" class="flex-1 overflow-y-auto p-6 flex flex-col"></div>
 
             <!-- Input Area -->
-            <footer class="p-6">
-                <div class="max-w-4xl mx-auto flex items-end gap-3 bg-white/5 p-2 rounded-[30px] border border-white/5 focus-within:border-violet-500/40">
-                    <textarea id="mainInput" rows="1" placeholder="Type a message..." class="flex-1 bg-transparent border-none py-3 px-4 text-sm outline-none resize-none no-scrollbar text-white/90"></textarea>
-                    <button id="btnSend" class="w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-pink-600 hover:scale-105 active:scale-95 transition-all">
-                        <i data-lucide="send" class="w-5 h-5 text-white"></i>
-                    </button>
-                </div>
+            <footer class="bg-[#202c33] p-2 flex items-center gap-2">
+                <button class="p-2 text-[#aebac1]"><i data-lucide="smile"></i></button>
+                <button class="p-2 text-[#aebac1]"><i data-lucide="plus"></i></button>
+                <input id="mainInput" type="text" placeholder="Type a message" class="flex-1 bg-[#2a3942] rounded-lg px-4 py-2.5 text-white outline-none text-sm">
+                <button id="btnSend" class="p-2 text-[#aebac1]"><i data-lucide="mic"></i></button>
             </footer>
-        </main>
-    </div>
-
-    <!-- Call UI -->
-    <div id="callUI" class="fixed inset-0 z-[1000] hidden bg-black flex flex-col items-center justify-center">
-        <h2 class="text-2xl font-bold mb-4">Calling Global Lounge...</h2>
-        <button id="btnEndCall" class="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center"><i data-lucide="phone-off"></i></button>
+        </div>
     </div>
 
     <script>
-        // Init Lucide Icons
         lucide.createIcons();
 
-        // 1. Supabase Config
+        // Prompt user for name
+        const MY_NAME = prompt("What is your name?") || "Stranger";
+
         const supabaseUrl = 'https://sengcxnwjmceywsohslq.supabase.co';
         const supabaseKey = 'sb_publishable_2KIjOCaAgLXMkbB2TXlugw_n8ebDMQz';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
@@ -175,66 +143,55 @@
         const mainInput = document.getElementById('mainInput');
         const btnSend = document.getElementById('btnSend');
 
-        // 2. UI Pe Message Dikhane Ka Function
-        function appendMessage(content, sender, type) {
+        function appendMessage(content, sender, type, time = new Date()) {
+            const timeStr = new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const div = document.createElement('div');
             div.className = `bubble ${type === 'out' ? 'bubble-out' : 'bubble-in'}`;
+            
             div.innerHTML = `
-                ${sender ? `<p class="text-[9px] font-black ${type === 'out' ? 'text-white/70' : 'text-violet-500'} mb-1 uppercase">${sender}</p>` : ''}
-                <p>${content}</p>
+                ${type === 'in' ? `<div class="sender-name">${sender}</div>` : ''}
+                <span>${content}</span>
+                <span class="time-stamp">${timeStr} ${type === 'out' ? '✓✓' : ''}</span>
             `;
+            
             msgCanvas.appendChild(div);
-            msgCanvas.scrollTo({ top: msgCanvas.scrollHeight, behavior: 'smooth' });
+            msgCanvas.scrollTop = msgCanvas.scrollHeight;
         }
 
-        // 3. Supabase Se Real-time Messages Pakadna
+        // Listen for new messages
         _supabase
             .channel('public:messages')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-                // Agar message kisi aur ne bheja hai toh screen pe dikhao
-                // (Optional: identify yourself to avoid double rendering if desired)
-                appendMessage(payload.new.content, payload.new.sender_name, 'in');
+                // Agar message doosre ne bheja hai tabhi screen pe dikhao (self-message already handled in handleSend)
+                if (payload.new.sender_name !== MY_NAME) {
+                    appendMessage(payload.new.content, payload.new.sender_name, 'in', payload.new.created_at);
+                }
             })
             .subscribe();
 
-        // 4. Message Bhejne Ka Main Function
         async function handleSendMessage() {
             const text = mainInput.value.trim();
             if (!text) return;
 
-            // UI pe turant dikhao (as 'out' bubble)
-            appendMessage(text, 'Me', 'out');
+            appendMessage(text, MY_NAME, 'out');
             mainInput.value = '';
-            mainInput.style.height = 'auto';
 
-            // Database mein daalo
             const { error } = await _supabase
                 .from('messages')
-                .insert([{ content: text, sender_name: 'Kamal' }]);
+                .insert([{ content: text, sender_name: MY_NAME }]);
 
-            if (error) console.error("Error:", error.message);
+            if (error) console.error(error);
         }
 
-        // Event Listeners
         btnSend.onclick = handleSendMessage;
+        mainInput.onkeydown = (e) => { if (e.key === 'Enter') handleSendMessage(); };
 
-        mainInput.onkeydown = (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSendMessage();
-            }
+        // Change mic to send icon when typing
+        mainInput.oninput = () => {
+            const icon = mainInput.value.trim() ? 'send' : 'mic';
+            btnSend.innerHTML = `<i data-lucide="${icon}"></i>`;
+            lucide.createIcons();
         };
-
-        // Auto-resize textarea
-        mainInput.oninput = function() {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
-        };
-
-        // Call UI Toggle
-        document.getElementById('btnCall').onclick = () => document.getElementById('callUI').classList.remove('hidden');
-        document.getElementById('btnEndCall').onclick = () => document.getElementById('callUI').classList.add('hidden');
-
     </script>
 </body>
 </html>
