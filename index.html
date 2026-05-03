@@ -3,90 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nanogram | Next-Gen Connect</title>
+    <title>Nanogram | Zero Cost Connect</title>
+    <!-- Tailwind for modern, clean layout -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide for detailed, high-quality, professional icons (like Instagram) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Supabase for DB/Chat -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- PeerJS for Call -->
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
-        body { background: radial-gradient(circle, #1a1a2e 0%, #16213e 100%); overflow: hidden; }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .neon-text { text-shadow: 0 0 10px #4f46e5, 0 0 20px #4f46e5; }
+        @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@300;600;900&display=swap');
+        
+        body { 
+            background: linear-gradient(135deg, #0d0121 0%, #17002d 100%);
+            font-family: 'Unbounded', sans-serif;
+            overflow: hidden; 
+        }
+
+        /* Glassmorphism that looks like real glass */
+        .glass { 
+            background: rgba(255, 255, 255, 0.01); 
+            backdrop-filter: blur(25px); 
+            border: 1px solid rgba(255, 255, 255, 0.03); 
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Ultra-sharp, premium gradient border effect */
+        .premium-border {
+            position: relative;
+            background: linear-gradient(#0d0121, #0d0121) padding-box,
+                        linear-gradient(135deg, rgba(79,70,229,0.3), rgba(219,39,119,0.3)) border-box;
+            border: 1px solid transparent;
+        }
+
+        /* Hyper-detailed neon effect */
+        .neon-brand { 
+            background: linear-gradient(90deg, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(139, 92, 246, 0.5), 
+                         0 0 30px rgba(236, 72, 153, 0.5);
+            font-weight: 900;
+            font-style: italic;
+        }
+        
+        /* Message styling - looks better than Instagram */
+        .msg-container::-webkit-scrollbar { width: 5px; }
+        .msg-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 10px; }
+        
+        /* Input styling */
+        .modern-input {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.03);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        
     </style>
 </head>
-<body class="text-white font-sans h-screen flex items-center justify-center">
+<body class="text-white h-screen flex items-center justify-center p-4">
 
-    <!-- Main App Container -->
-    <div class="w-full max-w-4xl h-[90vh] glass rounded-3xl flex overflow-hidden shadow-2xl">
+    <!-- Super-premium Main Container -->
+    <div class="w-full max-w-6xl h-[92vh] glass premium-border rounded-[40px] flex overflow-hidden">
         
-        <!-- Sidebar (Contacts) -->
-        <div class="w-1/3 border-r border-white/10 p-6 flex flex-col">
-            <h1 class="text-3xl font-black neon-text mb-8 italic">NANOGRAM</h1>
-            <div class="space-y-4">
-                <div class="p-3 glass rounded-xl flex items-center gap-3 cursor-pointer hover:bg-white/10 transition">
-                    <div class="w-10 h-10 bg-indigo-500 rounded-full"></div>
-                    <div><p class="font-bold">Global Lounge</p><p class="text-xs text-white/50">Online</p></div>
+        <!-- Sidebar - Instagram-style Layout -->
+        <div class="w-80 border-r border-white/5 p-8 flex flex-col justify-between">
+            <div>
+                <h1 class="text-4xl neon-brand mb-12 tracking-tighter">NANOGRAM</h1>
+                <div class="space-y-6">
+                    <!-- Nav items like Instagram -->
+                    <div class="flex items-center gap-5 text-lg font-light text-white/70 hover:text-white cursor-pointer transition">
+                        <i data-lucide="home"></i> Home
+                    </div>
+                    <div class="flex items-center gap-5 text-lg font-light text-white/70 hover:text-white cursor-pointer transition">
+                        <i data-lucide="compass"></i> Explore
+                    </div>
+                    <div class="flex items-center gap-5 text-lg font-semibold text-violet-400 bg-violet-950/20 px-4 py-3 rounded-2xl">
+                        <i data-lucide="message-square"></i> Chats
+                    </div>
+                    <div class="flex items-center gap-5 text-lg font-light text-white/70 hover:text-white cursor-pointer transition">
+                        <i data-lucide="users"></i> Groups
+                    </div>
+                </div>
+            </div>
+            <!-- Profile part -->
+            <div class="flex items-center gap-4 bg-white/5 p-4 rounded-3xl premium-border">
+                <div class="w-12 h-12 bg-gradient-to-r from-violet-600 to-pink-600 rounded-full flex items-center justify-center text-xl font-bold">K</div>
+                <div>
+                    <p class="font-bold">kamalpoor</p>
+                    <p class="text-xs text-white/40">Verified User</p>
                 </div>
             </div>
         </div>
 
-        <!-- Chat Area -->
+        <!-- Chat Area - The Visual Heart -->
         <div class="flex-1 flex flex-col">
-            <!-- Header -->
-            <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
-                <div><h2 class="text-xl font-bold">Public Room</h2></div>
+            <!-- Professional Header -->
+            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-black/10">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center text-white/50 premium-border">
+                        <i data-lucide="globe"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold">Global Lounge</h2>
+                        <div class="flex items-center gap-1.5 text-xs text-green-400"><div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div> 2,341 Online</div>
+                    </div>
+                </div>
                 <div class="flex gap-4">
-                    <button id="callBtn" class="p-2 bg-green-500/20 text-green-400 rounded-full hover:bg-green-500 hover:text-white transition">📞</button>
-                    <button class="p-2 bg-indigo-500/20 text-indigo-400 rounded-full hover:bg-indigo-500 hover:text-white transition">📹</button>
+                    <!-- High-quality Icons -->
+                    <button class="p-3.5 bg-zinc-900 rounded-full border border-white/5 text-white/60 hover:border-white/10 hover:text-white transition">
+                        <i data-lucide="phone"></i>
+                    </div>
+                    <button class="p-3.5 bg-zinc-900 rounded-full border border-white/5 text-white/60 hover:border-white/10 hover:text-white transition">
+                        <i data-lucide="video"></i>
+                    </div>
+                    <button class="p-3.5 bg-zinc-900 rounded-full border border-white/5 text-white/60 hover:border-white/10 hover:text-white transition">
+                        <i data-lucide="info"></i>
+                    </div>
                 </div>
             </div>
 
-            <!-- Messages Box -->
-            <div id="messages" class="flex-1 p-6 overflow-y-auto space-y-4 flex flex-col">
-                <!-- Messages will appear here -->
+            <!-- Modern Message List -->
+            <div id="messages" class="flex-1 p-8 overflow-y-auto space-y-6 flex flex-col msg-container">
+                <!-- Sample modern message bubble -->
+                <div class="max-w-[70%] p-5 rounded-3xl bg-zinc-900 self-start border border-white/5 font-light">
+                    Hello Nanogram world! Is this really possible with zero cost?
+                    <p class="text-[10px] text-white/30 mt-2 text-right">12:35 PM</p>
+                </div>
+                <div class="max-w-[70%] p-5 rounded-3xl bg-gradient-to-r from-violet-700 to-pink-700 self-end font-light">
+                    Yes it is, bhai! And it looks insane!
+                    <p class="text-[10px] text-white/30 mt-2 text-right">12:36 PM</p>
+                </div>
             </div>
 
-            <!-- Input Area -->
-            <div class="p-6 bg-white/5 flex gap-4">
-                <input id="msgInput" type="text" placeholder="Type a message..." class="flex-1 bg-white/10 border-none rounded-2xl px-6 py-3 focus:ring-2 focus:ring-indigo-500 outline-none">
-                <button id="sendBtn" class="bg-indigo-600 px-8 py-3 rounded-2xl font-bold hover:bg-indigo-500 shadow-lg shadow-indigo-500/30 transition">Send</button>
+            <!-- Ultra-modern Input Bar -->
+            <div class="p-6 bg-black/10 flex items-center gap-4 mt-auto border-t border-white/5">
+                <button class="text-white/40 hover:text-white"><i data-lucide="plus-circle"></i></button>
+                <div class="flex-1 relative">
+                    <input id="msgInput" type="text" placeholder="Start typing..." class="w-full modern-input rounded-full px-6 py-4 font-light text-white outline-none focus:ring-1 focus:ring-violet-500 transition">
+                    <button class="absolute right-3 top-3 text-white/30 hover:text-white"><i data-lucide="smile"></i></button>
+                </div>
+                <button id="sendBtn" class="bg-gradient-to-r from-violet-600 to-pink-600 w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-pink-500/30 hover:scale-105 transition">
+                    <i data-lucide="send"></i>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Video Modal (Hidden by default) -->
-    <div id="videoArea" class="hidden fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-50">
-        <video id="remoteVideo" autoplay class="w-3/4 rounded-3xl border-2 border-indigo-500"></video>
-        <video id="localVideo" autoplay muted class="w-48 absolute bottom-10 right-10 rounded-2xl border-2 border-white"></video>
-        <button id="hangup" class="mt-10 bg-red-600 px-10 py-4 rounded-full font-bold">End Call</button>
+    <!-- Video Calling Overlay (Hidden) -->
+    <div id="videoArea" class="hidden fixed inset-0 bg-black/95 flex flex-col items-center justify-center z-50 p-6">
+        <div class="relative w-full max-w-5xl h-[80vh]">
+            <video id="remoteVideo" autoplay class="w-full h-full rounded-[30px] object-cover premium-border shadow-2xl"></video>
+            <video id="localVideo" autoplay muted class="absolute bottom-6 right-6 w-52 h-40 rounded-2xl object-cover premium-border border-4 border-black"></video>
+        </div>
+        <div class="flex gap-6 mt-10">
+            <button class="p-6 bg-zinc-900 rounded-full text-white/70 hover:text-white"><i data-lucide="mic"></i></button>
+            <button id="hangup" class="p-6 bg-red-600 rounded-full text-white hover:bg-red-500"><i data-lucide="phone-off"></i></button>
+            <button class="p-6 bg-zinc-900 rounded-full text-white/70 hover:text-white"><i data-lucide="settings"></i></button>
+        </div>
     </div>
 
     <script>
-        // Supabase Connectivity (Add your keys here)
-        const supabaseUrl = 'YOUR_SUPABASE_URL';
-        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
-        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        // Initiate Icons
+        lucide.createIcons();
 
-        // UI Logic
+        // UI Basic Logic (Without DB integration yet)
         const sendBtn = document.getElementById('sendBtn');
         const msgInput = document.getElementById('msgInput');
         const msgBox = document.getElementById('messages');
 
-        // Function to show message
         function appendMessage(text, isMe) {
             const div = document.createElement('div');
-            div.className = `max-w-[70%] p-4 rounded-2xl ${isMe ? 'bg-indigo-600 self-end rounded-tr-none' : 'bg-white/10 self-start rounded-tl-none'}`;
+            const bgClass = isMe ? 'bg-gradient-to-r from-violet-700 to-pink-700 self-end' : 'bg-zinc-900 self-start border border-white/5';
+            div.className = `max-w-[70%] p-5 rounded-3xl font-light ${bgClass}`;
             div.innerText = text;
             msgBox.appendChild(div);
             msgBox.scrollTop = msgBox.scrollHeight;
         }
 
-        sendBtn.onclick = async () => {
+        sendBtn.onclick = () => {
             const text = msgInput.value;
             if(!text) return;
             appendMessage(text, true);
             msgInput.value = '';
-            // Yahan Supabase insert logic aayega
-            await _supabase.from('messages').insert([{ content: text, sender_id: 'User1' }]);
         };
     </script>
 </body>
