@@ -60,13 +60,15 @@
 
         .bubble {
             max-width: 75%;
-            padding: 1rem 1.25rem;
+            padding: 0.8rem 1rem;
             position: relative;
             font-weight: 300;
-            line-height: 1.6;
+            line-height: 1.4;
             font-size: 0.95rem;
             margin-bottom: 10px;
             animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            display: flex;
+            flex-direction: column;
         }
 
         .bubble-out {
@@ -80,6 +82,16 @@
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 24px 24px 24px 4px;
+        }
+
+        .msg-meta {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            opacity: 0.6;
+            margin-top: 4px;
         }
 
         @keyframes slideUp {
@@ -149,7 +161,7 @@
                 <div class="max-w-4xl mx-auto flex items-end gap-3 bg-white/5 p-2 rounded-[30px] border border-white/5 focus-within:border-violet-500/40">
                     <textarea id="mainInput" rows="1" placeholder="Type a message..." class="flex-1 bg-transparent border-none py-3 px-4 text-sm outline-none resize-none no-scrollbar text-white/90"></textarea>
                     <button id="btnSend" class="w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-pink-600 hover:scale-105 active:scale-95 transition-all">
-                        <i data-lucide="send" class="w-5 h-5 text-white"></i>
+                        <i data-lucide="mic" class="w-5 h-5 text-white"></i>
                     </button>
                 </div>
             </footer>
@@ -166,7 +178,10 @@
         // Init Lucide Icons
         lucide.createIcons();
 
-        // 1. Supabase Config
+        // WhatsApp Feature: Ask for Name
+        const MY_NAME = prompt("Enter your name for Nanogram:") || "Guest";
+
+        // Supabase Config
         const supabaseUrl = 'https://sengcxnwjmceywsohslq.supabase.co';
         const supabaseKey = 'sb_publishable_2KIjOCaAgLXMkbB2TXlugw_n8ebDMQz';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
@@ -175,47 +190,57 @@
         const mainInput = document.getElementById('mainInput');
         const btnSend = document.getElementById('btnSend');
 
-        // 2. UI Pe Message Dikhane Ka Function
-        function appendMessage(content, sender, type) {
+        // UI Pe Message Dikhane Ka Function
+        function appendMessage(content, sender, type, time = new Date()) {
+            const timeStr = new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const div = document.createElement('div');
             div.className = `bubble ${type === 'out' ? 'bubble-out' : 'bubble-in'}`;
+            
             div.innerHTML = `
-                ${sender ? `<p class="text-[9px] font-black ${type === 'out' ? 'text-white/70' : 'text-violet-500'} mb-1 uppercase">${sender}</p>` : ''}
+                ${sender && type === 'in' ? `<p class="text-[9px] font-black text-violet-500 mb-1 uppercase">${sender}</p>` : ''}
                 <p>${content}</p>
+                <div class="msg-meta">
+                    <span>${timeStr}</span>
+                    ${type === 'out' ? '<span>✓✓</span>' : ''}
+                </div>
             `;
             msgCanvas.appendChild(div);
             msgCanvas.scrollTo({ top: msgCanvas.scrollHeight, behavior: 'smooth' });
         }
 
-        // 3. Supabase Se Real-time Messages Pakadna
+        // Supabase Se Real-time Messages Pakadna
         _supabase
             .channel('public:messages')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-                // Agar message kisi aur ne bheja hai toh screen pe dikhao
-                // (Optional: identify yourself to avoid double rendering if desired)
-                appendMessage(payload.new.content, payload.new.sender_name, 'in');
+                if (payload.new.sender_name !== MY_NAME) {
+                    appendMessage(payload.new.content, payload.new.sender_name, 'in', payload.new.created_at);
+                }
             })
             .subscribe();
 
-        // 4. Message Bhejne Ka Main Function
+        // Message Bhejne Ka Main Function
         async function handleSendMessage() {
             const text = mainInput.value.trim();
             if (!text) return;
 
-            // UI pe turant dikhao (as 'out' bubble)
             appendMessage(text, 'Me', 'out');
             mainInput.value = '';
             mainInput.style.height = 'auto';
+            updateIcon('mic');
 
-            // Database mein daalo
             const { error } = await _supabase
                 .from('messages')
-                .insert([{ content: text, sender_name: 'Kamal' }]);
+                .insert([{ content: text, sender_name: MY_NAME }]);
 
             if (error) console.error("Error:", error.message);
         }
 
-        // Event Listeners
+        // Icon Toggle (Mic vs Send)
+        function updateIcon(iconName) {
+            btnSend.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5 text-white"></i>`;
+            lucide.createIcons();
+        }
+
         btnSend.onclick = handleSendMessage;
 
         mainInput.onkeydown = (e) => {
@@ -225,13 +250,12 @@
             }
         };
 
-        // Auto-resize textarea
         mainInput.oninput = function() {
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
+            updateIcon(this.value.trim() ? 'send' : 'mic');
         };
 
-        // Call UI Toggle
         document.getElementById('btnCall').onclick = () => document.getElementById('callUI').classList.remove('hidden');
         document.getElementById('btnEndCall').onclick = () => document.getElementById('callUI').classList.add('hidden');
 
