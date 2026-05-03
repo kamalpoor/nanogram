@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NANOGRAM | Ultimate Edition</title>
+    <title>NANOGRAM | Ultimate Edition Pro</title>
     
-    <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -16,89 +15,32 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;800&family=Space+Grotesk:wght@300;700&display=swap');
         
         :root {
-            --p: #7c3aed;
-            --s: #db2777;
-            --bg: #030303;
-            --surface: rgba(255, 255, 255, 0.02);
-            --accent: #10b981;
+            --p: #7c3aed; --s: #db2777; --bg: #030303;
+            --surface: rgba(255, 255, 255, 0.02); --accent: #10b981;
         }
 
         body {
             background-color: var(--bg);
-            background-image: 
-                radial-gradient(at 10% 10%, rgba(124, 58, 237, 0.1) 0px, transparent 40%),
-                radial-gradient(at 90% 90%, rgba(219, 39, 119, 0.1) 0px, transparent 40%);
+            background-image: radial-gradient(at 10% 10%, rgba(124, 58, 237, 0.1) 0px, transparent 40%), radial-gradient(at 90% 90%, rgba(219, 39, 119, 0.1) 0px, transparent 40%);
             font-family: 'Plus Jakarta Sans', sans-serif;
-            color: #fafafa;
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            color: #fafafa; height: 100vh; margin: 0; display: flex; align-items: center; justify-content: center; overflow: hidden;
         }
 
-        .master-container {
-            width: 100%;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(40px);
-            display: flex;
-            position: relative;
-        }
+        .master-container { width: 100%; height: 100vh; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(40px); display: flex; position: relative; }
+        @media (min-width: 1024px) { .master-container { width: 96%; height: 92vh; border-radius: 40px; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8); overflow: hidden; } }
 
-        @media (min-width: 1024px) {
-            .master-container {
-                width: 96%;
-                height: 92vh;
-                border-radius: 40px;
-                border: 1px solid rgba(255, 255, 255, 0.05);
-                box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8);
-                overflow: hidden;
-            }
-        }
+        .bubble { max-width: 75%; padding: 0.8rem 1rem; position: relative; font-weight: 300; line-height: 1.4; font-size: 0.95rem; margin-bottom: 10px; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; display: flex; flex-direction: column; }
+        .bubble-out { align-self: flex-end; background: linear-gradient(135deg, var(--p), var(--s)); border-radius: 24px 24px 4px 24px; }
+        .bubble-in { align-self: flex-start; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px 24px 24px 4px; }
 
-        .bubble {
-            max-width: 75%;
-            padding: 0.8rem 1rem;
-            position: relative;
-            font-weight: 300;
-            line-height: 1.4;
-            font-size: 0.95rem;
-            margin-bottom: 10px;
-            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .bubble-out {
-            align-self: flex-end;
-            background: linear-gradient(135deg, var(--p), var(--s));
-            border-radius: 24px 24px 4px 24px;
-        }
-
-        .bubble-in {
-            align-self: flex-start;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px 24px 24px 4px;
-        }
-
-        .msg-meta {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 4px;
-            font-size: 10px;
-            opacity: 0.6;
-            margin-top: 4px;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
+        .recording-wave { display: none; align-items: center; gap: 3px; height: 20px; }
+        .wave-bar { width: 3px; height: 100%; background: #ef4444; animation: wave 0.5s infinite ease-in-out; }
+        @keyframes wave { 0%, 100% { height: 5px; } 50% { height: 20px; } }
+        
+        .status-ring { padding: 2px; border: 2px solid #7c3aed; border-radius: 50%; cursor: pointer; }
+        .msg-meta { display: flex; justify-content: flex-end; align-items: center; gap: 4px; font-size: 10px; opacity: 0.6; margin-top: 4px; }
+        .tick-blue { color: #38bdf8; }
+        
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .custom-scroll::-webkit-scrollbar { width: 3px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
@@ -112,9 +54,9 @@
             <div class="flex flex-col items-center gap-10">
                 <div class="w-12 h-12 bg-gradient-to-tr from-violet-600 to-pink-600 rounded-2xl flex items-center justify-center font-black text-xl italic shadow-lg">N</div>
                 <div class="flex flex-col gap-8">
-                    <button class="text-violet-500"><i data-lucide="message-square"></i></button>
-                    <button class="text-white/40"><i data-lucide="compass"></i></button>
-                    <button class="text-white/40"><i data-lucide="heart"></i></button>
+                    <button onclick="switchTab('chats')" class="text-violet-500 tab-btn"><i data-lucide="message-square"></i></button>
+                    <button onclick="showStatusModal()" class="text-white/40 hover:text-violet-400"><i data-lucide="circle-dashed"></i></button>
+                    <button class="text-white/40"><i data-lucide="users"></i></button>
                 </div>
             </div>
             <button class="text-white/20 hover:text-white"><i data-lucide="settings"></i></button>
@@ -122,15 +64,25 @@
 
         <!-- Chat List -->
         <aside class="w-80 border-r border-white/5 hidden sm:flex flex-col bg-black/10">
-            <div class="p-8 pb-4">
-                <h2 class="text-2xl font-black font-['Space_Grotesk']">Messages</h2>
+            <div class="p-8 pb-4 flex justify-between items-center">
+                <h2 class="text-2xl font-black font-['Space_Grotesk']">Chats</h2>
+                <button class="p-2 bg-white/5 rounded-full"><i data-lucide="plus" class="w-4 h-4"></i></button>
             </div>
-            <div class="flex-1 overflow-y-auto custom-scroll px-4 space-y-2">
-                <div class="p-4 rounded-[28px] bg-white/5 border border-white/5 flex items-center gap-4 cursor-pointer">
-                    <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center">🌍</div>
-                    <div>
-                        <h4 class="font-bold text-sm text-violet-400">Global Lounge</h4>
-                        <p class="text-xs text-white/40">Live Chat Active</p>
+            <div id="chatList" class="flex-1 overflow-y-auto custom-scroll px-4 space-y-2">
+                <!-- Status Row -->
+                <div class="flex gap-4 overflow-x-auto no-scrollbar py-2 mb-4">
+                    <div onclick="addStatus()" class="min-w-[60px] flex flex-col items-center gap-1">
+                        <div class="w-12 h-12 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center"><i data-lucide="plus" class="w-4 h-4"></i></div>
+                        <span class="text-[10px]">Your Status</span>
+                    </div>
+                    <div id="statusArea" class="flex gap-3"></div>
+                </div>
+
+                <div class="p-4 rounded-[28px] bg-white/5 border border-white/5 flex items-center gap-4 cursor-pointer hover:bg-white/10 transition-all">
+                    <div class="status-ring"><div class="w-11 h-11 bg-indigo-600 rounded-full flex items-center justify-center">🌍</div></div>
+                    <div class="flex-1">
+                        <div class="flex justify-between"><h4 class="font-bold text-sm text-violet-400">Global Lounge</h4><span class="text-[10px] opacity-40">12:45</span></div>
+                        <p class="text-xs text-white/40 truncate">Typing...</p>
                     </div>
                 </div>
             </div>
@@ -139,49 +91,90 @@
         <!-- Main Chat -->
         <main class="flex-1 flex flex-col relative">
             <header class="h-20 px-8 border-b border-white/5 flex justify-between items-center bg-black/5">
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-4 cursor-pointer" onclick="toggleProfile()">
                     <div class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 text-xl">🌍</div>
                     <div>
                         <h3 class="font-bold">Global Lounge</h3>
-                        <p class="text-[9px] text-green-500 uppercase font-black tracking-widest">Online</p>
+                        <p id="onlineStatus" class="text-[9px] text-green-500 uppercase font-black tracking-widest">Online</p>
                     </div>
                 </div>
-                <button id="btnCall" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 hover:bg-green-500/20"><i data-lucide="phone" class="w-4 h-4"></i></button>
+                <div class="flex gap-3">
+                    <button id="btnVideo" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 hover:bg-violet-500/20"><i data-lucide="video" class="w-4 h-4"></i></button>
+                    <button id="btnCall" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 hover:bg-green-500/20"><i data-lucide="phone" class="w-4 h-4"></i></button>
+                </div>
             </header>
 
             <!-- Message Canvas -->
-            <div id="messageCanvas" class="flex-1 overflow-y-auto p-8 flex flex-col custom-scroll">
-                <div class="flex justify-center my-4">
-                    <span class="px-4 py-1 rounded-full bg-white/5 text-[9px] text-white/30 uppercase tracking-widest">Encrypted Session</span>
+            <div id="messageCanvas" class="flex-1 overflow-y-auto p-8 flex flex-col custom-scroll"></div>
+
+            <!-- Recording Overlay -->
+            <div id="recordingUI" class="hidden px-8 py-2 flex items-center gap-4 bg-black/40 backdrop-blur-md">
+                <div class="recording-wave" style="display: flex;">
+                    <div class="wave-bar" style="animation-delay: 0.1s"></div>
+                    <div class="wave-bar" style="animation-delay: 0.3s"></div>
+                    <div class="wave-bar" style="animation-delay: 0.2s"></div>
                 </div>
+                <span class="text-red-500 text-xs font-bold">REC <span id="recTimer">0:00</span></span>
+                <span class="text-white/40 text-xs">Slide to cancel</span>
             </div>
 
             <!-- Input Area -->
             <footer class="p-6">
                 <div class="max-w-4xl mx-auto flex items-end gap-3 bg-white/5 p-2 rounded-[30px] border border-white/5 focus-within:border-violet-500/40">
+                    <button class="p-3 text-white/40 hover:text-white"><i data-lucide="paperclip"></i></button>
                     <textarea id="mainInput" rows="1" placeholder="Type a message..." class="flex-1 bg-transparent border-none py-3 px-4 text-sm outline-none resize-none no-scrollbar text-white/90"></textarea>
-                    <button id="btnSend" class="w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-pink-600 hover:scale-105 active:scale-95 transition-all">
+                    <button id="btnVoice" class="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-all">
                         <i data-lucide="mic" class="w-5 h-5 text-white"></i>
+                    </button>
+                    <button id="btnSend" class="hidden w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-pink-600">
+                        <i data-lucide="send" class="w-5 h-5 text-white"></i>
                     </button>
                 </div>
             </footer>
         </main>
+
+        <!-- Right Profile Sidebar (WhatsApp Style) -->
+        <div id="profileSidebar" class="w-0 overflow-hidden border-l border-white/5 transition-all duration-300 bg-black/20">
+            <div class="w-80 p-8">
+                <div class="flex justify-between mb-8"><h2 class="font-bold">Contact Info</h2><button onclick="toggleProfile()"><i data-lucide="x"></i></button></div>
+                <div class="flex flex-col items-center gap-4">
+                    <div class="w-32 h-32 bg-indigo-600 rounded-full flex items-center justify-center text-4xl shadow-2xl">🌍</div>
+                    <h2 class="text-xl font-bold">Global Lounge</h2>
+                    <p class="text-white/40 text-sm text-center">Public channel for everyone to chat and share ideas!</p>
+                </div>
+                <div class="mt-10 space-y-4">
+                    <button class="w-full p-4 rounded-2xl bg-white/5 flex items-center gap-4 text-red-400"><i data-lucide="slash"></i> Block Group</button>
+                    <button class="w-full p-4 rounded-2xl bg-white/5 flex items-center gap-4 text-red-500"><i data-lucide="trash-2"></i> Clear Chat</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Call UI -->
-    <div id="callUI" class="fixed inset-0 z-[1000] hidden bg-black flex flex-col items-center justify-center">
-        <h2 class="text-2xl font-bold mb-4">Calling Global Lounge...</h2>
-        <button id="btnEndCall" class="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center"><i data-lucide="phone-off"></i></button>
+    <!-- Enhanced Call UI -->
+    <div id="callUI" class="fixed inset-0 z-[1000] hidden bg-zinc-900 flex flex-col items-center justify-between py-20">
+        <div class="text-center">
+            <div class="w-24 h-24 bg-white/10 rounded-full mx-auto mb-6 flex items-center justify-center text-3xl animate-pulse">🌍</div>
+            <h2 class="text-3xl font-bold">Global Lounge</h2>
+            <p class="text-green-500 mt-2">Calling...</p>
+        </div>
+        
+        <div id="videoContainer" class="hidden w-full max-w-2xl aspect-video bg-black rounded-3xl border border-white/10 overflow-hidden relative">
+            <div class="absolute bottom-4 right-4 w-32 aspect-video bg-zinc-800 rounded-lg border border-white/20"></div>
+        </div>
+
+        <div class="flex gap-6">
+            <button onclick="toggleMute(this)" class="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20"><i data-lucide="mic"></i></button>
+            <button onclick="toggleVideo(this)" class="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20"><i data-lucide="video-off"></i></button>
+            <button onclick="shareScreen()" class="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 text-blue-400"><i data-lucide="monitor"></i></button>
+            <button id="btnEndCall" class="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center hover:bg-red-700 shadow-lg shadow-red-600/20"><i data-lucide="phone-off"></i></button>
+        </div>
     </div>
 
     <script>
-        // Init Lucide Icons
         lucide.createIcons();
 
-        // WhatsApp Feature: Ask for Name
-        const MY_NAME = prompt("Enter your name for Nanogram:") || "Guest";
-
-        // Supabase Config
+        // 1. Core Config
+        const MY_NAME = prompt("Enter your name:") || "User";
         const supabaseUrl = 'https://sengcxnwjmceywsohslq.supabase.co';
         const supabaseKey = 'sb_publishable_2KIjOCaAgLXMkbB2TXlugw_n8ebDMQz';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
@@ -189,74 +182,120 @@
         const msgCanvas = document.getElementById('messageCanvas');
         const mainInput = document.getElementById('mainInput');
         const btnSend = document.getElementById('btnSend');
+        const btnVoice = document.getElementById('btnVoice');
+        const recordingUI = document.getElementById('recordingUI');
 
-        // UI Pe Message Dikhane Ka Function
-        function appendMessage(content, sender, type, time = new Date()) {
-            const timeStr = new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        // 2. Messaging Logic
+        function appendMessage(content, sender, type, isAudio = false) {
             const div = document.createElement('div');
             div.className = `bubble ${type === 'out' ? 'bubble-out' : 'bubble-in'}`;
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
             div.innerHTML = `
                 ${sender && type === 'in' ? `<p class="text-[9px] font-black text-violet-500 mb-1 uppercase">${sender}</p>` : ''}
-                <p>${content}</p>
+                ${isAudio ? `<div class="flex items-center gap-2"><i data-lucide="play" class="w-4 h-4"></i><div class="w-32 h-1 bg-white/20 rounded-full"></div></div>` : `<p>${content}</p>`}
                 <div class="msg-meta">
-                    <span>${timeStr}</span>
-                    ${type === 'out' ? '<span>✓✓</span>' : ''}
+                    <span>${time}</span>
+                    ${type === 'out' ? `<span class="tick-blue">✓✓</span>` : ''}
                 </div>
             `;
             msgCanvas.appendChild(div);
+            lucide.createIcons();
             msgCanvas.scrollTo({ top: msgCanvas.scrollHeight, behavior: 'smooth' });
         }
 
-        // Supabase Se Real-time Messages Pakadna
-        _supabase
-            .channel('public:messages')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-                if (payload.new.sender_name !== MY_NAME) {
-                    appendMessage(payload.new.content, payload.new.sender_name, 'in', payload.new.created_at);
-                }
-            })
-            .subscribe();
+        // 3. Real-time Listening
+        _supabase.channel('messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, p => {
+            if (p.new.sender_name !== MY_NAME) appendMessage(p.new.content, p.new.sender_name, 'in');
+        }).subscribe();
 
-        // Message Bhejne Ka Main Function
-        async function handleSendMessage() {
-            const text = mainInput.value.trim();
-            if (!text) return;
-
-            appendMessage(text, 'Me', 'out');
-            mainInput.value = '';
-            mainInput.style.height = 'auto';
-            updateIcon('mic');
-
-            const { error } = await _supabase
-                .from('messages')
-                .insert([{ content: text, sender_name: MY_NAME }]);
-
-            if (error) console.error("Error:", error.message);
-        }
-
-        // Icon Toggle (Mic vs Send)
-        function updateIcon(iconName) {
-            btnSend.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5 text-white"></i>`;
-            lucide.createIcons();
-        }
-
-        btnSend.onclick = handleSendMessage;
-
-        mainInput.onkeydown = (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSendMessage();
-            }
+        // 4. Voice Recording Emulation
+        let recInterval;
+        btnVoice.onmousedown = () => {
+            recordingUI.classList.remove('hidden');
+            let sec = 0;
+            recInterval = setInterval(() => {
+                sec++;
+                document.getElementById('recTimer').innerText = `0:${sec < 10 ? '0'+sec : sec}`;
+            }, 1000);
         };
 
+        btnVoice.onmouseup = () => {
+            clearInterval(recInterval);
+            recordingUI.classList.add('hidden');
+            appendMessage('', 'Me', 'out', true);
+            document.getElementById('recTimer').innerText = "0:00";
+        };
+
+        // 5. Input Toggle Logic
         mainInput.oninput = function() {
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
-            updateIcon(this.value.trim() ? 'send' : 'mic');
+            if(this.value.trim().length > 0) {
+                btnSend.classList.remove('hidden');
+                btnVoice.classList.add('hidden');
+            } else {
+                btnSend.classList.add('hidden');
+                btnVoice.classList.remove('hidden');
+            }
         };
 
+        btnSend.onclick = async () => {
+            const text = mainInput.value.trim();
+            if(!text) return;
+            appendMessage(text, 'Me', 'out');
+            mainInput.value = '';
+            btnSend.classList.add('hidden');
+            btnVoice.classList.remove('hidden');
+            await _supabase.from('messages').insert([{ content: text, sender_name: MY_NAME }]);
+        };
+
+        // 6. UI Toggles
+        function toggleProfile() {
+            const side = document.getElementById('profileSidebar');
+            side.style.width = side.style.width === '320px' ? '0px' : '320px';
+        }
+
+        function showStatusModal() {
+            const url = prompt("Enter Image URL for your Story:");
+            if(url) {
+                const area = document.getElementById('statusArea');
+                const div = document.createElement('div');
+                div.className = "min-w-[60px] flex flex-col items-center gap-1";
+                div.innerHTML = `<div class="status-ring"><img src="${url}" class="w-11 h-11 rounded-full object-cover"></div><span class="text-[10px]">Just now</span>`;
+                area.prepend(div);
+            }
+        }
+
+        // 7. Call Functionalities
+        function toggleMute(btn) {
+            const icon = btn.querySelector('i');
+            const isMuted = icon.getAttribute('data-lucide') === 'mic-off';
+            btn.innerHTML = `<i data-lucide="${isMuted ? 'mic' : 'mic-off'}"></i>`;
+            lucide.createIcons();
+        }
+
+        function toggleVideo(btn) {
+            const container = document.getElementById('videoContainer');
+            container.classList.toggle('hidden');
+            const icon = btn.querySelector('i');
+            const isOff = icon.getAttribute('data-lucide') === 'video-off';
+            btn.innerHTML = `<i data-lucide="${isOff ? 'video' : 'video-off'}"></i>`;
+            lucide.createIcons();
+        }
+
+        async function shareScreen() {
+            try {
+                await navigator.mediaDevices.getDisplayMedia({ video: true });
+                alert("Screen sharing started!");
+            } catch (e) { console.error(e); }
+        }
+
         document.getElementById('btnCall').onclick = () => document.getElementById('callUI').classList.remove('hidden');
+        document.getElementById('btnVideo').onclick = () => {
+            document.getElementById('callUI').classList.remove('hidden');
+            document.getElementById('videoContainer').classList.remove('hidden');
+        };
         document.getElementById('btnEndCall').onclick = () => document.getElementById('callUI').classList.add('hidden');
 
     </script>
