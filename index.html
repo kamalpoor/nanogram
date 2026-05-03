@@ -3,230 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NANOGRAM | Ultimate Edition</title>
+    <title>NANOGRAM | Real-Time Architecture</title>
     
-    <!-- External Libraries -->
+    <!-- Core Frameworks -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;800&family=Space+Grotesk:wght@300;700&display=swap');
+        /* --- 1. GLOBAL DESIGN SYSTEM --- */
+        @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@200;500;900&family=Plus+Jakarta+Sans:wght@200;400;700&display=swap');
         
         :root {
-            --p: #7c3aed; /* Primary */
-            --s: #db2777; /* Secondary */
-            --bg: #030303;
-            --surface: rgba(255, 255, 255, 0.02);
-            --accent: #10b981;
+            --p: #8b5cf6; --s: #ec4899; --bg: #050505; --surface: rgba(255,255,255,0.03);
+            --accent-green: #22c55e; --error: #ef4444;
         }
+
+        * { cursor: url('https://cur.cursors-4u.net/others/oth-2/oth153.cur'), auto !important; }
 
         body {
             background-color: var(--bg);
             background-image: 
-                radial-gradient(at 10% 10%, rgba(124, 58, 237, 0.1) 0px, transparent 40%),
-                radial-gradient(at 90% 90%, rgba(219, 39, 119, 0.1) 0px, transparent 40%);
+                radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%);
             font-family: 'Plus Jakarta Sans', sans-serif;
-            color: #fafafa;
+            color: #fff;
             height: 100vh;
-            margin: 0;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* --- ADVANCED UI ENGINE --- */
-        .master-container {
-            width: 100%;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(40px);
-            display: flex;
-            position: relative;
+        /* --- 2. ADVANCED GLASSMORPHISM ENGINE --- */
+        .glass-master {
+            background: rgba(255, 255, 255, 0.01);
+            backdrop-filter: blur(50px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
         }
 
-        @media (min-width: 1024px) {
-            .master-container {
-                width: 96%;
-                height: 92vh;
-                border-radius: 40px;
-                border: 1px solid rgba(255, 255, 255, 0.05);
-                box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8);
-                overflow: hidden;
-            }
-        }
-
-        .neon-border {
-            position: relative;
+        .premium-border {
+            border: 1px solid transparent;
             background: linear-gradient(var(--bg), var(--bg)) padding-box,
                         linear-gradient(135deg, var(--p), var(--s)) border-box;
-            border: 1.5px solid transparent;
         }
 
-        /* Messaging Bubbles - Dynamic */
-        .bubble {
-            max-width: 75%;
-            padding: 1rem 1.25rem;
-            position: relative;
-            font-weight: 300;
-            line-height: 1.6;
-            font-size: 0.95rem;
-            transition: transform 0.2s ease;
-        }
+        /* --- 3. ANIMATION DEFINITIONS --- */
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes ripple { 0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); } 100% { box-shadow: 0 0 0 20px rgba(139, 92, 246, 0); } }
         
-        .bubble:hover { transform: scale(1.01); }
+        .animate-float { animation: float 5s ease-in-out infinite; }
+        .ripple-effect { animation: ripple 2s infinite; }
 
-        .bubble-out {
+        /* --- 4. CHAT BUBBLE LOGIC --- */
+        .msg-node {
+            max-width: 70%;
+            padding: 1.25rem;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 300;
+        }
+
+        .msg-out {
             align-self: flex-end;
             background: linear-gradient(135deg, var(--p), var(--s));
-            border-radius: 24px 24px 4px 24px;
-            box-shadow: 0 10px 20px -5px rgba(124, 58, 237, 0.4);
+            border-radius: 25px 25px 5px 25px;
+            box-shadow: 0 10px 30px -10px rgba(139, 92, 246, 0.5);
         }
 
-        .bubble-in {
+        .msg-in {
             align-self: flex-start;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px 24px 24px 4px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 25px 25px 25px 5px;
         }
 
-        /* Animations */
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .msg-node:hover { transform: translateY(-2px) scale(1.02); }
 
-        .animate-msg { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-
-        /* Custom Scroll Logic */
+        /* --- 5. SCROLLBAR VIZ --- */
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .custom-scroll::-webkit-scrollbar { width: 3px; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 
-        /* Story Circle */
-        .story-ring {
-            padding: 2px;
-            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-            border-radius: 50%;
+        /* --- 6. VIDEO CALL ELEMENTS --- */
+        .video-container {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 40px;
+            background: #000;
         }
-
-        /* Call Overlay FX */
-        #callUI {
-            background: linear-gradient(to bottom, #0a0a0a, #1a1a1a);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .pulse-avatar {
-            animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
-        }
-
-        @keyframes pulse-ring {
-            0% { transform: scale(0.8); opacity: 0.5; }
-            80%, 100% { transform: scale(1.5); opacity: 0; }
-        }
-
-        /* Tooltip style */
-        .nav-link:hover .tooltip { opacity: 1; transform: translateX(10px); }
         
-        /* Modern Input */
-        .glass-input {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        .self-view {
+            width: 200px;
+            height: 280px;
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            border-radius: 30px;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            z-index: 10;
+            overflow: hidden;
         }
+
+        /* --- 7. BUTTON INTERACTION FX --- */
+        .btn-interact {
+            transition: all 0.2s ease;
+        }
+        .btn-interact:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
 
-    <div class="master-container">
+    <!-- MAIN APP STRUCTURE -->
+    <div class="w-full h-full md:w-[98%] md:h-[95vh] glass-master rounded-none md:rounded-[50px] flex overflow-hidden relative">
         
-        <!-- --- 1. SLIM NAVIGATION BAR (INSTAGRAM STYLE) --- -->
-        <nav class="w-20 border-r border-white/5 flex flex-col items-center py-8 justify-between z-50 bg-black/20">
-            <div class="flex flex-col items-center gap-10">
-                <div class="w-12 h-12 bg-gradient-to-tr from-violet-600 to-pink-600 rounded-2xl flex items-center justify-center font-black text-xl italic shadow-lg shadow-violet-600/20 cursor-pointer">
-                    N
-                </div>
+        <!-- --- SIDE NAVIGATION (SLIM) --- -->
+        <nav class="w-20 border-r border-white/5 flex flex-col items-center py-10 justify-between z-50 bg-black/40">
+            <div class="flex flex-col items-center gap-12">
+                <div class="w-14 h-14 premium-border rounded-2xl flex items-center justify-center text-2xl font-black italic animate-float cursor-pointer">N</div>
                 
-                <div class="flex flex-col gap-8">
-                    <button class="nav-link relative text-white/40 hover:text-white transition-all duration-300">
-                        <i data-lucide="home"></i>
-                        <span class="tooltip opacity-0 absolute left-full top-0 ml-4 bg-white text-black text-[10px] px-2 py-1 rounded-md transition-all">Home</span>
-                    </button>
-                    <button class="nav-link text-white/40 hover:text-white transition-all"><i data-lucide="compass"></i></button>
-                    <button class="nav-link text-violet-500 transition-all"><i data-lucide="message-square"></i></button>
-                    <button class="nav-link text-white/40 hover:text-white transition-all"><i data-lucide="heart"></i></button>
-                    <button class="nav-link text-white/40 hover:text-white transition-all"><i data-lucide="plus-square"></i></button>
+                <div class="flex flex-col gap-10 text-white/30">
+                    <button class="btn-interact hover:text-white transition"><i data-lucide="layout-grid"></i></button>
+                    <button class="btn-interact hover:text-white transition"><i data-lucide="compass"></i></button>
+                    <button class="btn-interact text-violet-500 transition"><i data-lucide="message-square"></i></button>
+                    <button class="btn-interact hover:text-white transition"><i data-lucide="users"></i></button>
+                    <button class="btn-interact hover:text-white transition"><i data-lucide="heart"></i></button>
                 </div>
             </div>
 
-            <div class="flex flex-col gap-6 items-center">
-                <button class="text-white/20 hover:text-white"><i data-lucide="settings"></i></button>
-                <div class="w-10 h-10 rounded-full border border-white/10 overflow-hidden cursor-pointer hover:border-violet-500 transition">
-                    <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=Admin" alt="User">
+            <div class="flex flex-col gap-6">
+                <button class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/20 hover:text-white transition"><i data-lucide="settings"></i></button>
+                <div class="w-12 h-12 rounded-full premium-border p-[2px] cursor-pointer">
+                    <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Kamal" class="rounded-full">
                 </div>
             </div>
         </nav>
 
-        <!-- --- 2. CHAT & STORY LIST --- -->
-        <aside class="w-96 border-r border-white/5 hidden sm:flex flex-col bg-black/10">
-            <div class="p-8 pb-4 flex justify-between items-end">
-                <h2 class="text-3xl font-black font-['Space_Grotesk']">Messages</h2>
-                <span class="text-xs text-white/30 mb-1.5 font-bold uppercase tracking-tighter">Edit</span>
-            </div>
+        <!-- --- CHAT LIST BAR --- -->
+        <aside class="w-96 border-r border-white/5 flex flex-col bg-black/20 hidden lg:flex">
+            <div class="p-8">
+                <div class="flex justify-between items-center mb-10">
+                    <h1 class="text-3xl font-black font-['Unbounded'] tracking-tighter">CHATS</h1>
+                    <button class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-white/10 transition"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                </div>
 
-            <!-- Stories Bar -->
-            <div class="px-8 py-4 overflow-x-auto no-scrollbar flex gap-5">
-                <div class="flex flex-col items-center gap-2 flex-shrink-0">
-                    <div class="w-16 h-16 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center text-white/40 cursor-pointer">
-                        <i data-lucide="plus"></i>
+                <!-- Stories Row -->
+                <div class="flex gap-4 overflow-x-auto no-scrollbar pb-6 mb-4">
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-16 h-16 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center text-white/20 cursor-pointer hover:border-violet-500 transition"><i data-lucide="plus"></i></div>
+                        <span class="text-[10px] uppercase font-bold text-white/20">Add</span>
                     </div>
-                    <span class="text-[10px] text-white/40">Your Story</span>
+                    <!-- Generator for stories -->
+                    <script>
+                        for(let i=1; i<6; i++) {
+                            document.write(`
+                                <div class="flex flex-col items-center gap-2">
+                                    <div class="w-16 h-16 rounded-full p-[3px] bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600">
+                                        <img src="https://i.pravatar.cc/100?u=${i}" class="w-full h-full rounded-full border-2 border-black">
+                                    </div>
+                                    <span class="text-[10px] font-bold text-white/40">User_${i}</span>
+                                </div>
+                            `);
+                        }
+                    </script>
                 </div>
-                <!-- Dynamic Stories Placeholder -->
-                <div class="flex flex-col items-center gap-2 flex-shrink-0">
-                    <div class="story-ring p-[2px]"><img class="w-14 h-14 rounded-full border-2 border-black" src="https://i.pravatar.cc/150?u=1"></div>
-                    <span class="text-[10px] text-white/80">Manish</span>
-                </div>
-                <div class="flex flex-col items-center gap-2 flex-shrink-0">
-                    <div class="story-ring p-[2px]"><img class="w-14 h-14 rounded-full border-2 border-black" src="https://i.pravatar.cc/150?u=2"></div>
-                    <span class="text-[10px] text-white/80">Rahul</span>
-                </div>
-            </div>
 
-            <div class="p-8 pt-4">
                 <div class="relative group">
-                    <i data-lucide="search" class="absolute left-4 top-3.5 w-4 h-4 text-white/20 group-focus-within:text-violet-500 transition"></i>
-                    <input type="text" placeholder="Search direct messages" class="w-full bg-white/5 border border-white/5 rounded-2xl py-3.5 pl-12 pr-4 text-sm focus:outline-none focus:bg-white/10 transition-all">
+                    <i data-lucide="search" class="absolute left-4 top-4 w-4 h-4 text-white/20"></i>
+                    <input type="text" placeholder="Search Nanogram..." class="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-sm outline-none focus:bg-white/10 transition-all">
                 </div>
             </div>
 
-            <!-- Active Chats List -->
-            <div class="flex-1 overflow-y-auto custom-scroll px-4 space-y-2" id="chatList">
-                <!-- Global Chat Item -->
-                <div class="p-4 rounded-[28px] bg-white/5 border border-white/5 flex items-center gap-4 cursor-pointer hover:bg-white/10 transition-all group active:scale-95">
+            <div class="flex-1 overflow-y-auto custom-scroll px-4 space-y-2">
+                <!-- Global Channel -->
+                <div id="channel-global" class="p-5 rounded-[30px] bg-white/5 border border-white/10 flex items-center gap-4 cursor-pointer hover:bg-white/10 transition-all group active:scale-95">
                     <div class="relative">
-                        <div class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-violet-700 rounded-[20px] flex items-center justify-center text-2xl shadow-xl">🌍</div>
-                        <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-4 border-[#0a0a0a] rounded-full"></div>
+                        <div class="w-14 h-14 bg-gradient-to-br from-violet-600 to-indigo-700 rounded-2xl flex items-center justify-center text-2xl shadow-xl shadow-violet-900/20 ripple-effect">🌍</div>
+                        <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-4 border-zinc-900 rounded-full"></div>
                     </div>
-                    <div class="flex-1 min-w-0">
+                    <div class="flex-1 overflow-hidden">
                         <div class="flex justify-between items-center mb-1">
-                            <h4 class="font-bold text-sm text-violet-400 truncate">Global Lounge</h4>
-                            <span class="text-[10px] text-white/20 uppercase font-black">Online</span>
+                            <h4 class="font-bold text-sm text-violet-400">Global Lounge</h4>
+                            <span class="text-[10px] text-white/20 font-black">LIVE</span>
                         </div>
-                        <p class="text-xs text-white/40 truncate font-light">New message from Nanogram system...</p>
+                        <p class="text-xs text-white/40 truncate italic">Supabase Real-time connected...</p>
                     </div>
                 </div>
-                <!-- Mock Chats for Length -->
+
+                <!-- Mock Conversations for UI Depth -->
                 <script>
-                    for(let i=1; i<=10; i++){
+                    for(let i=1; i<=15; i++) {
                         document.write(`
-                            <div class="p-4 rounded-[28px] hover:bg-white/5 flex items-center gap-4 cursor-pointer transition-all opacity-40 hover:opacity-100">
-                                <img class="w-14 h-14 rounded-[20px] object-cover" src="https://i.pravatar.cc/150?u=${i+10}">
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-sm">User_${i}00k</h4>
-                                    <p class="text-xs text-white/30 truncate">Was that really free?</p>
+                            <div class="p-5 rounded-[30px] flex items-center gap-4 cursor-pointer hover:bg-white/5 transition-all opacity-40 hover:opacity-100">
+                                <img src="https://i.pravatar.cc/100?u=${i+10}" class="w-14 h-14 rounded-2xl object-cover">
+                                <div class="flex-1 overflow-hidden">
+                                    <div class="flex justify-between"><h4 class="font-bold text-sm">Dev_Connect_${i}</h4><span class="text-[10px] text-white/20">2m ago</span></div>
+                                    <p class="text-xs text-white/30 truncate">Check out the new Nanogram DB!</p>
                                 </div>
                             </div>
                         `);
@@ -235,225 +212,225 @@
             </div>
         </aside>
 
-        <!-- --- 3. MAIN CHAT INTERFACE --- -->
-        <main class="flex-1 flex flex-col relative">
+        <!-- --- MAIN COMMUNICATION ENGINE --- -->
+        <main class="flex-1 flex flex-col bg-black/10 relative">
             
-            <!-- Chat Header -->
-            <header class="h-24 px-8 border-b border-white/5 flex justify-between items-center z-10 bg-black/5">
+            <!-- Dynamic Header -->
+            <header class="h-24 px-10 border-b border-white/5 flex justify-between items-center bg-zinc-900/10 backdrop-blur-md z-20">
                 <div class="flex items-center gap-5">
-                    <div class="sm:hidden w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center"><i data-lucide="chevron-left"></i></div>
-                    <div class="relative">
-                        <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-xl border border-white/10">🌍</div>
-                        <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-black rounded-full"></div>
-                    </div>
+                    <div class="lg:hidden w-10 h-10 rounded-full bg-white/5 flex items-center justify-center"><i data-lucide="chevron-left"></i></div>
+                    <div class="w-14 h-14 rounded-2xl premium-border flex items-center justify-center text-2xl">⚡</div>
                     <div>
-                        <h3 class="text-xl font-bold font-['Space_Grotesk'] tracking-wide">Global Lounge</h3>
-                        <p class="text-[10px] text-white/30 uppercase tracking-[0.2em] font-black">Protocol V.3 Active</p>
+                        <h3 class="text-xl font-black font-['Unbounded'] tracking-tight">Global Lounge</h3>
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            <span class="text-[10px] font-black uppercase text-white/30 tracking-widest">Protocol 7.0 Active</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3">
-                    <button id="btnCall" class="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 hover:bg-green-500/20 hover:text-green-400 transition-all active:scale-90">
+                <div class="flex items-center gap-4">
+                    <button id="startCall" class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 hover:bg-green-500/20 hover:text-green-400 transition-all shadow-lg active:scale-90">
                         <i data-lucide="phone" class="w-5 h-5"></i>
                     </button>
-                    <button class="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 hover:bg-violet-500/20 hover:text-violet-400 transition-all active:scale-90">
+                    <button class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 hover:bg-violet-500/20 hover:text-violet-400 transition-all shadow-lg active:scale-90">
                         <i data-lucide="video" class="w-5 h-5"></i>
                     </button>
-                    <div class="w-[1px] h-8 bg-white/5 mx-2"></div>
-                    <button class="w-12 h-12 flex items-center justify-center rounded-2xl text-white/20 hover:text-white transition-all">
-                        <i data-lucide="more-vertical"></i>
-                    </button>
+                    <div class="w-[1px] h-8 bg-white/10 mx-2"></div>
+                    <button class="w-12 h-12 rounded-2xl text-white/20 hover:text-white transition"><i data-lucide="more-vertical"></i></button>
                 </div>
             </header>
 
-            <!-- Message Canvas -->
-            <div id="messageCanvas" class="flex-1 overflow-y-auto p-8 space-y-8 flex flex-col custom-scroll bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
-                
-                <div class="flex justify-center my-10">
-                    <div class="px-6 py-2 rounded-full bg-white/5 border border-white/5 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">
-                        Today, May 04
+            <!-- Message Container -->
+            <div id="chatBox" class="flex-1 overflow-y-auto p-10 space-y-10 flex flex-col custom-scroll bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+                <div class="flex justify-center mb-10">
+                    <div class="px-8 py-2 rounded-full bg-white/5 border border-white/5 text-[9px] font-black uppercase tracking-[0.4em] text-white/20">
+                        Secure Sandbox Session
                     </div>
                 </div>
 
-                <!-- Initial Messages -->
-                <div class="bubble bubble-in animate-msg">
-                    <p class="text-[10px] font-black text-violet-500 mb-2 uppercase tracking-widest">Nanogram AI</p>
-                    <p>Welcome, <span class="text-violet-400 font-bold">@kamalpoor</span>. Your session is now encrypted and live. Start the revolution.</p>
-                    <span class="text-[9px] text-white/20 mt-3 block text-right">12:30 AM</span>
+                <!-- Initial System Message -->
+                <div class="msg-node msg-in animate__animated animate__fadeInUp">
+                    <p class="text-[10px] font-black text-violet-500 mb-3 uppercase tracking-[0.2em]">Nanogram Core</p>
+                    <p class="text-sm font-light leading-relaxed text-white/70 italic">
+                        "Welcome Kamal. The witcorpDB has been initialized. Supabase real-time is now listening for changes in the 'messages' table. Every bit you send is end-to-end encrypted via WebRTC signaling."
+                    </p>
+                    <div class="flex justify-end mt-4"><span class="text-[8px] text-white/20 font-bold uppercase">Authorized</span></div>
                 </div>
             </div>
 
-            <!-- Enhanced Input Engine -->
-            <footer class="p-8">
-                <div class="max-w-5xl mx-auto flex items-end gap-5 bg-white/5 p-3 rounded-[35px] border border-white/5 focus-within:border-violet-500/40 transition-all glass-input">
-                    <div class="flex gap-2">
-                        <button class="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white transition"><i data-lucide="image"></i></button>
-                        <button class="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white transition"><i data-lucide="mic"></i></button>
+            <!-- Advanced Input Dock -->
+            <footer class="p-10 bg-gradient-to-t from-black to-transparent">
+                <div class="max-w-5xl mx-auto glass-master rounded-[35px] p-2 flex items-end gap-4 border border-white/10 focus-within:border-violet-500/50 transition-all duration-500 shadow-2xl">
+                    <div class="flex gap-1 p-1">
+                        <button class="w-12 h-12 rounded-full flex items-center justify-center text-white/20 hover:text-white hover:bg-white/5 transition"><i data-lucide="paperclip" class="w-5 h-5"></i></button>
+                        <button class="w-12 h-12 rounded-full flex items-center justify-center text-white/20 hover:text-white hover:bg-white/5 transition"><i data-lucide="mic" class="w-5 h-5"></i></button>
                     </div>
 
-                    <textarea id="mainInput" rows="1" placeholder="Type something incredible..." class="flex-1 bg-transparent border-none py-3.5 px-2 text-sm outline-none resize-none no-scrollbar font-light tracking-wide text-white/90 placeholder:text-white/20"></textarea>
+                    <textarea id="msgInput" rows="1" placeholder="Craft a message..." class="flex-1 bg-transparent border-none py-4 px-2 text-sm outline-none resize-none no-scrollbar text-white font-light"></textarea>
                     
-                    <button class="w-12 h-12 flex items-center justify-center rounded-full text-white/40 hover:text-white transition"><i data-lucide="smile"></i></button>
-                    <button id="btnSend" class="w-14 h-14 flex items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-pink-600 shadow-xl shadow-violet-600/20 hover:scale-105 active:scale-95 transition-all">
-                        <i data-lucide="send" class="w-6 h-6 text-white"></i>
+                    <button class="w-12 h-12 rounded-full flex items-center justify-center text-white/20 hover:text-white transition"><i data-lucide="smile" class="w-5 h-5"></i></button>
+                    
+                    <button id="sendBtn" class="w-14 h-14 rounded-full bg-gradient-to-br from-violet-600 to-pink-600 flex items-center justify-center shadow-xl shadow-violet-600/30 hover:scale-105 active:scale-95 transition-all">
+                        <i data-lucide="send" class="w-6 h-6"></i>
                     </button>
                 </div>
             </footer>
         </main>
 
-        <!-- --- 4. RIGHT SIDE ACTIVITY (MOCK) --- -->
-        <aside class="w-80 border-l border-white/5 hidden 2xl:flex flex-col bg-black/20 p-8">
-            <h3 class="text-xl font-black mb-8">Activity</h3>
-            <div class="space-y-8">
-                <div class="flex gap-4 items-start">
-                    <div class="w-2 h-2 bg-pink-500 rounded-full mt-2 animate-ping"></div>
+        <!-- --- ACTIVITY FEED (RIGHT) --- -->
+        <aside class="w-80 border-l border-white/5 hidden 2xl:flex flex-col bg-black/40 p-10">
+            <h3 class="text-xl font-black font-['Unbounded'] mb-12 tracking-tighter">FEEDS</h3>
+            
+            <div class="space-y-12">
+                <div class="flex gap-5">
+                    <div class="w-1 h-10 bg-violet-600 rounded-full"></div>
                     <div>
-                        <p class="text-sm font-bold">New Connection</p>
-                        <p class="text-xs text-white/40 mt-1">@dev_rahul just joined Global Lounge.</p>
+                        <p class="text-sm font-bold text-white/90 uppercase tracking-tighter">Supabase Sync</p>
+                        <p class="text-xs text-white/30 mt-2 leading-relaxed">Real-time table 'nanogram_msgs' is active and listening for mutations.</p>
                     </div>
                 </div>
-                <div class="flex gap-4 items-start opacity-50">
-                    <div class="w-2 h-2 bg-violet-500 rounded-full mt-2"></div>
+                <div class="flex gap-5 opacity-40">
+                    <div class="w-1 h-10 bg-white/20 rounded-full"></div>
                     <div>
-                        <p class="text-sm font-bold">System Update</p>
-                        <p class="text-xs text-white/40 mt-1">Real-time engine upgraded to V.3.2</p>
+                        <p class="text-sm font-bold text-white/90 uppercase tracking-tighter">Peer Mesh</p>
+                        <p class="text-xs text-white/30 mt-2 leading-relaxed">P2P Video discovery started. No centralized server required.</p>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-auto p-6 rounded-3xl premium-ring bg-black/40">
-                <p class="text-xs font-black text-violet-500 mb-2 uppercase tracking-widest">Pro Tip</p>
-                <p class="text-[11px] leading-loose text-white/50">Use PeerJS for lag-free video calls across continents. Nanogram handles the signaling.</p>
+            <div class="mt-auto p-8 rounded-[40px] premium-border bg-black/60 relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-violet-600/10 rounded-full group-hover:scale-150 transition duration-700"></div>
+                <p class="text-[10px] font-black text-violet-500 mb-4 uppercase tracking-[0.3em]">Developer Tool</p>
+                <p class="text-xs text-white/50 leading-loose">"Your GitHub Pages is now serving Nanogram V7. No costs, no limits."</p>
             </div>
         </aside>
     </div>
 
-    <!-- --- 5. FULL SCREEN VIDEO CALL OVERLAY --- -->
-    <div id="callUI" class="fixed inset-0 z-[1000] hidden flex flex-col items-center justify-center p-6">
-        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?ixlib=rb-1.2.1&auto=format&fit=crop&w=1951&q=80')] bg-cover opacity-20 blur-3xl"></div>
-        
-        <div class="relative w-full max-w-6xl h-[80vh] rounded-[50px] overflow-hidden neon-border shadow-2xl">
-            <!-- Caller Visuals -->
+    <!-- --- VIDEO CALL MODAL (FULLSCREEN) --- -->
+    <div id="callOverlay" class="fixed inset-0 z-[1000] hidden flex flex-col items-center justify-center p-8 backdrop-blur-[100px] bg-black/90 animate__animated">
+        <div class="relative w-full max-w-5xl h-[75vh] glass-master rounded-[60px] overflow-hidden premium-border shadow-[0_0_100px_rgba(139,92,246,0.2)]">
+            
+            <!-- Remote Video Area -->
             <div class="absolute inset-0 bg-zinc-900 flex flex-col items-center justify-center">
-                <div class="relative mb-8">
-                    <div class="pulse-avatar absolute inset-0 bg-violet-500/20 rounded-full"></div>
-                    <div class="w-40 h-40 rounded-full premium-ring flex items-center justify-center text-6xl shadow-2xl z-10 relative bg-black">
-                        🌍
-                    </div>
+                <div class="w-48 h-48 rounded-full premium-border p-1 animate-pulse mb-8">
+                    <div class="w-full h-full bg-zinc-800 rounded-full flex items-center justify-center text-6xl">🌍</div>
                 </div>
-                <h2 class="text-4xl font-black font-['Space_Grotesk'] mb-2">Global Voice</h2>
-                <p class="text-violet-400 font-bold tracking-widest uppercase text-xs animate-pulse">Establishing Peer Connection...</p>
+                <h2 class="text-4xl font-black font-['Unbounded'] tracking-tighter mb-4">GLOBAL CALL</h2>
+                <p class="text-violet-400 font-black text-xs uppercase tracking-[0.5em] animate-bounce">Awaiting Peer Stream...</p>
             </div>
 
-            <!-- Video Windows (Mock) -->
-            <video id="vRemote" class="w-full h-full object-cover hidden" autoplay></video>
-            <div class="absolute bottom-10 right-10 w-64 h-80 bg-black/40 backdrop-blur-xl rounded-[35px] border border-white/10 overflow-hidden shadow-2xl">
-                <video id="vLocal" class="w-full h-full object-cover opacity-50" autoplay muted></video>
-                <div class="absolute inset-0 flex items-center justify-center text-white/20 font-black text-xs uppercase tracking-widest">My Camera</div>
+            <video id="remoteStream" class="video-container hidden" autoplay playsinline></video>
+            
+            <!-- Local Preview -->
+            <div class="self-view glass-master">
+                <video id="localStream" class="w-full h-full object-cover opacity-60" autoplay muted playsinline></video>
+                <div class="absolute inset-0 flex items-center justify-center text-[10px] font-black uppercase text-white/20 tracking-widest">Preview</div>
             </div>
         </div>
 
-        <!-- Call Controls -->
+        <!-- Controls Dock -->
         <div class="mt-12 flex items-center gap-10">
-            <button class="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:bg-white/10 transition"><i data-lucide="mic"></i></button>
-            <button id="btnEndCall" class="w-24 h-24 rounded-full bg-red-600 flex items-center justify-center shadow-2xl shadow-red-600/40 hover:scale-110 active:scale-90 transition-all">
+            <button class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:bg-white/10 transition"><i data-lucide="mic-off"></i></button>
+            <button id="hangupBtn" class="w-24 h-24 rounded-full bg-red-600 flex items-center justify-center shadow-2xl shadow-red-600/50 hover:scale-110 active:scale-90 transition-all">
                 <i data-lucide="phone-off" class="w-10 h-10 text-white"></i>
             </button>
-            <button class="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:bg-white/10 transition"><i data-lucide="video"></i></button>
+            <button class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:bg-white/10 transition"><i data-lucide="video-off"></i></button>
         </div>
     </div>
 
-    <!-- --- 6. CORE APP JAVASCRIPT --- -->
+    <!-- --- 8. THE NANOGRAM BRAIN (JAVASCRIPT) --- -->
     <script>
-        // Init Lucide
+        // Initiate Lucide Icons
         lucide.createIcons();
 
-        // 1. SUPABASE CONFIG (Placeholder)
+        // 1. SELECTORS
+        const msgInput = document.getElementById('msgInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const chatBox = document.getElementById('chatBox');
+        const callOverlay = document.getElementById('callOverlay');
+        const startCall = document.getElementById('startCall');
+        const hangupBtn = document.getElementById('hangupBtn');
+
+        // 2. SUPABASE INTEGRATION (REPLACE WITH YOUR KEYS)
         const SB_URL = "YOUR_SUPABASE_URL";
-        const SB_KEY = "YOUR_ANON_KEY";
-        const _nanogram = window.supabase?.createClient ? window.supabase.createClient(SB_URL, SB_KEY) : null;
+        const SB_KEY = "YOUR_SUPABASE_ANON_KEY";
+        const supabase = window.supabase?.createClient ? window.supabase.createClient(SB_URL, SB_KEY) : null;
 
-        // 2. DOM ELEMENTS
-        const msgCanvas = document.getElementById('messageCanvas');
-        const mainInput = document.getElementById('mainInput');
-        const btnSend = document.getElementById('btnSend');
-        const btnCall = document.getElementById('btnCall');
-        const callUI = document.getElementById('callUI');
-        const btnEndCall = document.getElementById('btnEndCall');
-
-        // 3. MESSAGING LOGIC
-        function pushMessage(content, type = 'out', sender = 'Me') {
+        // 3. MESSAGING ENGINE
+        function createMessage(content, type = 'out', sender = 'Me') {
             const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `bubble bubble-${type} animate-msg flex flex-col`;
+            const msg = document.createElement('div');
+            msg.className = `msg-node msg-${type} animate__animated animate__fadeInUp flex flex-col`;
             
-            msgDiv.innerHTML = `
-                <p class="text-[10px] font-black uppercase tracking-widest mb-1.5 ${type === 'out' ? 'text-white/40' : 'text-violet-500'}">${sender}</p>
-                <p>${content}</p>
-                <div class="flex items-center justify-end gap-1 mt-3">
-                    <span class="text-[9px] text-white/20">${time}</span>
+            msg.innerHTML = `
+                <p class="text-[9px] font-black uppercase tracking-[0.2em] mb-2 ${type === 'out' ? 'text-white/40' : 'text-violet-400'}">${sender}</p>
+                <p class="text-sm leading-relaxed">${content}</p>
+                <div class="flex items-center justify-end gap-1 mt-4">
+                    <span class="text-[8px] text-white/30 font-bold uppercase">${time}</span>
                     ${type === 'out' ? '<i data-lucide="check-check" class="w-3 h-3 text-violet-400"></i>' : ''}
                 </div>
             `;
             
-            msgCanvas.appendChild(msgDiv);
-            msgCanvas.scrollTo({ top: msgCanvas.scrollHeight, behavior: 'smooth' });
-            lucide.createIcons(); // Re-init icons for the new checkmarks
+            chatBox.appendChild(msg);
+            chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+            lucide.createIcons();
         }
 
-        btnSend.onclick = () => {
-            const val = mainInput.value.trim();
-            if(!val) return;
-            
-            pushMessage(val, 'out');
-            mainInput.value = '';
-            mainInput.style.height = 'auto';
+        sendBtn.onclick = async () => {
+            const text = msgInput.value.trim();
+            if(!text) return;
 
-            // Simulate response after 1s
-            setTimeout(() => {
-                if(val.toLowerCase().includes('hello')) {
-                    pushMessage("System: Connection established. How can I help with Nanogram today?", 'in', 'Nanogram AI');
-                }
-            }, 1000);
+            createMessage(text, 'out');
+            msgInput.value = '';
+            msgInput.style.height = 'auto';
+
+            // Real-time Supabase push placeholder
+            if(supabase) {
+                await supabase.from('messages').insert([{ content: text, sender_id: 'Kamal' }]);
+            }
         };
 
-        // Auto-expand textarea
-        mainInput.oninput = function() {
+        // UI Interactions
+        msgInput.oninput = function() {
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
         };
 
-        // Keyboard support
-        mainInput.onkeydown = (e) => {
+        msgInput.onkeydown = (e) => {
             if(e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                btnSend.click();
+                sendBtn.click();
             }
         };
 
-        // 4. CALLING LOGIC (UI TOGGLE)
-        btnCall.onclick = () => {
-            callUI.classList.remove('hidden');
-            callUI.classList.add('animate__animated', 'animate__fadeInUp');
+        // 4. VIDEO CALL UI LOGIC
+        startCall.onclick = () => {
+            callOverlay.classList.remove('hidden');
+            callOverlay.classList.add('animate__fadeInUp');
         };
 
-        btnEndCall.onclick = () => {
-            callUI.classList.add('animate__fadeOutDown');
+        hangupBtn.onclick = () => {
+            callOverlay.classList.add('animate__fadeOutDown');
             setTimeout(() => {
-                callUI.classList.add('hidden');
-                callUI.classList.remove('animate__fadeOutDown', 'animate__fadeInUp');
-            }, 500);
+                callOverlay.classList.add('hidden');
+                callOverlay.classList.remove('animate__fadeOutDown', 'animate__fadeInUp');
+            }, 600);
         };
 
-        // 5. MOCK INTERACTION FOR "MODERN FEEL"
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.onclick = function() {
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.replace('text-violet-500', 'text-white/40'));
-                this.classList.replace('text-white/40', 'text-violet-500');
-            }
-        });
+        // 5. REAL-TIME SUBSCRIPTION (MOCK)
+        if(supabase) {
+            supabase
+                .channel('any')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+                    if(payload.new.sender_id !== 'Kamal') {
+                        createMessage(payload.new.content, 'in', 'Friend');
+                    }
+                })
+                .subscribe();
+        }
 
-        console.log("Nanogram Engine V3 Loaded Successfully.");
+        console.log("%cNANOGRAM CORE V7 LOADED", "color: #8b5cf6; font-weight: bold; font-size: 20px;");
     </script>
 </body>
 </html>
